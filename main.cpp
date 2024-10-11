@@ -1,5 +1,5 @@
-#include <cstdlib>
-#include <iostream>
+#include <cstdlib> // system("cls")
+#include <iostream> // cin og cout
 
 const int tiles = 3;
 char board[tiles][tiles] = {
@@ -47,36 +47,47 @@ void playerUpdate() {
 }
 
 bool checkWin() {
-    char p1 = 'X';
-    char p2 = 'O';
-    for (int row = 0; row < tiles; row++) {
-        if (board[row][0] == p1 && board[row][1] == p1 && board[row][2] == p1)
+    for (int i = 0; i < tiles; i++) {
+        if ((board[i][0] == board[i][1] && board[i][1] == board[i][2]) || // check row
+            (board[0][i] == board[1][i] && board[1][i] == board[2][i]))   // check col
             return true;
-        if (board[row][0] == p2 && board[row][1] == p2 && board[row][2] == p2)
+    } 
+    if ((board[0][0] == board[1][1] && board[1][1] == board[2][2]) ||
+            (board[0][2] == board[1][1] && board[1][1] == board[2][0]))
             return true;
-    }
-    for (int col = 0; col < tiles; col++) {
-        if (board[0][col] == p1 && board[1][col] == p1 && board[2][col] == p1)
-            return true;
-        if (board[0][col] == p2 && board[1][col] == p2 && board[2][col] == p2)
-            return true;
-    }
-
-
 
     return false;
 }
 
-int main(void) {
-    bool gameOver = false; 
-    while (!gameOver) {
-        printBoard();
-        playerUpdate();
-        if (checkWin()) {
-            gameOver = true;
+bool checkTie() {
+    for (int row = 0; row < tiles; row++) {
+        for (int col = 0; col < tiles; col++) {
+            if (board[row][col] != 'X' && board[row][col] != 'O')
+                return false; 
         }
     }
-    printBoard();
-    std::cout << "player: " << current << " won\n";
+    return true;
+}
+
+int main(void) {
+    bool gameWon = false; 
+    bool gameTie = false;
+    while (!gameWon && !gameTie) {
+        printBoard();
+        playerUpdate();
+        gameWon = checkWin(); 
+        gameTie = checkTie();
+    }
+
+    if (gameTie) {
+        printBoard();
+        std::cout << "Game Tie!!\n";
+    }
+    else if (gameWon){
+        playerSwitch(); // switch back, siden ikke kjører funksjonen igjen etter loop
+        printBoard();
+        std::cout << "player: " << current << " won\n";
+    }
+    
     return 0;
 }
